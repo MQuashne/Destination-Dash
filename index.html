@@ -6,15 +6,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Destination Dash</title>
   <link rel="stylesheet" href="styles.css">
-  
+  <link rel="stylesheet" href="stackedCards.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Cabin:wght@400;600;700&family=Josefin+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=flight_takeoff" />
 </head>
 
 <body>
   <header></header>
-  <main></main>
+  <main>
+    
+    <div id="game-content">
+      <div id="destination-row" class="game-row">
+        <div id="departures"><span class="material-symbols-outlined">
+            flight_takeoff
+          </span> DEPARTURES</div>
+        <div id="destination-zone" class="zone-row">
+          
+          <div class="destination-card"><img class="card-img" src="images/card_back.png" /></div>
+          <div class="destination-card"></div>
+          <div class="destination-card"></div>
+          
+        </div>
+        
+      </div>
+      <div id="progress">
+        <div id="circle1" class="circle start"></div>
+        <div class="line"></div>
+        <div id="circle2" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle3" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+        <div class="line"></div>
+        <div id="circle4" class="circle open"></div>
+      </div>
+      <div id="resources-row">
+        
+        <div id="fuel-row">
+          <span class="zone-label">Fuel</span>
+          <div id="fuel-zone" class="resource-zone">
+          </div>
+        </div>
+        <div id="pax-row">
+          <span class="zone-label">Passengers</span>
+          <div id="seating-zone">
+            <table id="seating">
+              <tr class="head-row head">
+                <td class="start head">A</td>
+                <td class="head">B</td>
+                <td class="aisle head"></td>
+                <td class="head">C</td>
+                <td class="end head">D</td>
+              </tr>
+              <tr class="seats">
+                <td class="seat taken"></td>
+                <td class="seat"></td>
+                <td class="aisle">1</td>
+                <td class="seat"></td>
+                <td class="seat"></td>
+              </tr>
+              <tr class="seats">
+                <td class="seat"></td>
+                <td class="seat"></td>
+                <td class="aisle">2</td>
+                <td class="seat"></td>
+                <td class="seat"></td>
+              </tr>
+              <tr class="seats">
+                <td class="seat"></td>
+                <td class="seat"></td>
+                <td class="aisle">3</td>
+                <td class="seat"></td>
+                <td class="seat"></td>
+              </tr>
+              <tr class="seats">
+                <td class="seat"></td>
+                <td class="seat"></td>
+                <td class="aisle">4</td>
+                <td class="seat"></td>
+                <td class="seat"></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div id="plane-row" class="resource-grid"><span class="zone-label">Planes</span>
+          <div id="plane-zone">
+            <img class="plane" src="images/plane.png" />
+            <img class="plane" src="images/plane.png" />
+            <img class="plane" src="images/plane.png" />
+          </div>
+        </div>
+      </div>
+      <div id="action-row">
+        <button id="draw-btn" class="btn">Draw</button>
+        <button class="btn btn-primary">Fly</button>
+        <button class="btn btn-fortune">Play Fortune</button>
+        <button class="btn btn-ghost">End Turn</button>
+      </div>
+      <div id="player-hand">
+        <div class="stacked-cards">
+          <ul id="player-cards">
+            <li>placeholder</li>
+            <li>placeholder</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop open" id="modal-backdrop">
+      <div class="modal" id="modal">
+        <div class="modal-art" id="modal-art"></div>
+        <div class="modal-header">
+          <div class="modal-title" id="modal-title">Title</div>
+          <div class="modal-badge" id="modal-badge"></div>
+        </div>
+        <div class="modal-body" id="modal-body">body</div>
+        <div class="modal-stats" id="modal-stats"></div>
+        <div class="modal-footer">
+          <button class="btn btn-play" id="modal-play-btn">✈ Play</button>
+          <button class="btn btn-discard" id="modal-close-btn">✕ Close</button>
+        </div>
+      </div>
+    </div>
+    
+    
+  </main>
   
-  <script src="main.js"></script>
-  
+  <script type="module" src="scripts/main.js"></script>
+  <script src="scripts/stackedCards.js"></script>
 </body>
 
 </html>
