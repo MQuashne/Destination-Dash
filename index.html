@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Destination Dash</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="stackedCards.css">
+  <link rel="stylesheet" href="scripts/diceRoller/diceRoller.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Cabin:wght@400;600;700&family=Josefin+Sans:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=flight_takeoff" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 
 <body>
@@ -20,9 +20,19 @@
     
     <div id="game-content">
       <div id="destination-row" class="game-row">
-        <div id="departures"><span class="material-symbols-outlined">
+        <div id="departure-heading"><span class="material-icons">
             flight_takeoff
-          </span> DEPARTURES</div>
+          </span> DEPARTURES
+          <!-- <span class="material-icons">
+            task_alt
+          </span> -->
+          <span class="material-icons" id="destination-progress">
+           
+             radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked
+          </span>
+          
+          
+        </div>
         <div id="destination-zone" class="zone-row">
           
           <div class="destination-card"><img class="card-img" src="images/card_back.png" /></div>
@@ -31,25 +41,6 @@
           
         </div>
         
-      </div>
-      <div id="progress">
-        <div id="circle1" class="circle start"></div>
-        <div class="line"></div>
-        <div id="circle2" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle3" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
-        <div class="line"></div>
-        <div id="circle4" class="circle open"></div>
       </div>
       <div id="resources-row">
         
@@ -109,41 +100,90 @@
         </div>
       </div>
       <div id="action-row">
-        <button id="draw-btn" class="btn">Draw</button>
-        <button class="btn btn-primary">Fly</button>
-        <button class="btn btn-fortune">Play Fortune</button>
-        <button class="btn btn-ghost">End Turn</button>
+        <button id="deal-btn" class="btn btn-primary hidden">Deal</button>
+        <button id="draw-btn" class="btn btn-primary hidden">＋ Draw</button>
+        <button id="end-turn-btn" class="btn btn-ghost hidden">End Turn</button>
+        <button id="start-over-btn" class="btn btn-danger hidden">Start Over</button>
+        <button id="boarding-btn" class="btn btn-primary hidden">💺 Board Passengers</button>
+        <button id="resolve-crises-btn" class="btn btn-danger hidden">⚠ RESOLVE CRISES! ⚠</button>
+        <div id="banner" class="banner discard hidden">Discard X Cards</div>
       </div>
-      <div id="player-hand">
-        <div class="stacked-cards">
-          <ul id="player-cards">
-            <li>placeholder</li>
-            <li>placeholder</li>
-          </ul>
+      
+      <div class="hand-stage" id="hand-stage">
+        <div class="nav-hint left" id="nav-left">‹</div>
+        <div class="nav-hint right" id="nav-right">›</div>
+      </div>
+      
+    </div>
+    
+    <!-- CARD PLAY MODAL-->
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal" id="modal">
+        <div class="modal-art" id="modal-art"><img src="images/fortune_crystal_ball.png"></div>
+        <div class="modal-header">
+          <div class="modal-title" id="modal-title">Title</div>
+          <div class="modal-badge" id="modal-badge">Fortune</div>
+        </div>
+        <div class="modal-body" id="modal-body">text</div>
+        <div class="modal-stats" id="modal-stats"></div>
+        <div class="modal-footer" id="modal-footer">
+          <button class="btn btn-play" id="modal-play-btn">✈ Play</button>
+          <button class="btn btn-danger hidden" id="modal-resolve-btn">⚠ Resolve</button>
+          <button class="btn btn-fortune hidden" id="modal-avert-btn">★ Crisis Averted</button>
+          <button class="btn btn-play" id="modal-fly-btn">✈ Fly</button>
+          <button class="btn btn-discard" id="modal-discard-btn">🗑️ Discard</button>
+          <button class="btn btn-discard" id="modal-close-btn">✕ Close</button>
+          <button class="btn btn-discard" id="modal-dest-close-btn">✕ Close</button>
+          
         </div>
       </div>
     </div>
-    <div class="modal-backdrop open" id="modal-backdrop">
-      <div class="modal" id="modal">
-        <div class="modal-art" id="modal-art"></div>
-        <div class="modal-header">
-          <div class="modal-title" id="modal-title">Title</div>
-          <div class="modal-badge" id="modal-badge"></div>
+    
+    <!-- OTHER/ALL-PURPOSE MODAL-->
+    <div class="modal-backdrop" id="gen-modal-backdrop">
+      <div class="modal" id="gen-modal" style="position:relative; max-width:100%; box-shadow: none;">
+        <div class="modal-header" id="gen-modal-header">
+          <span class="modal-title" id="gen-modal-title">Title</span>
         </div>
-        <div class="modal-body" id="modal-body">body</div>
-        <div class="modal-stats" id="modal-stats"></div>
-        <div class="modal-footer">
-          <button class="btn btn-play" id="modal-play-btn">✈ Play</button>
-          <button class="btn btn-discard" id="modal-close-btn">✕ Close</button>
+        <div class="modal-body" id="gen-modal-body">
+          <p id="gen-modal-headline">Headline</p>
+          <p style="margin-top: 10px;" class="flavor-text" id="gen-modal-text">Body text</p>
+          <div id="gen-modal-other-content"class="hidden"></div>
+        </div>
+        <div class="modal-footer" id="gen-modal-footer">
         </div>
       </div>
     </div>
     
     
   </main>
+  <div class="dice-backdrop" id="dice-backdrop">
+    <div class="dice-modal">
+      
+      ```
+      <div class="dice-modal-header">
+        <span class="dice-modal-title" id="dice-title">Roll</span>
+      </div>
+      
+      <!-- dice appear here, sliding up from the bottom edge -->
+      <div class="dice-stage" id="dice-stage">
+        <!-- .die elements injected by JS -->
+      </div>
+      
+      <!-- total shown after roll settles -->
+      <div class="dice-total" id="dice-total"></div>
+      
+      <div class="dice-modal-footer">
+        <button class="btn btn-confirm" id="btn-confirm">✓ Take It</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast hidden" id="toast">✈ Flying to Sunset Island…</div>
   
   <script type="module" src="scripts/main.js"></script>
-  <script src="scripts/stackedCards.js"></script>
+  <script type="module" src="scripts/cardhand.js"></script>
+  <script type="module" src="scripts/diceRoller/diceRoller.js">
+  </script>
 </body>
 
 </html>

@@ -1,0 +1,286 @@
+
+:root {
+--teal-dark:  #2E4A4F;
+--teal-mid:   #3D6B6E;
+--gold:       #E8A820;
+--gold-light: #F5C842;
+--coral:      #D94F3D;
+--warm-white: #F5EFE0;
+--card-face:  #FDFAF3;
+--ink:        #2A2118;
+--ink-soft:   #4A3D30;
+--font:       'Josefin Sans', sans-serif;
+
+/* ── Die appearance ──────────────────────────────
+Edit these to restyle the dice.
+--die-size      : width & height of each die
+--die-bg        : face colour
+--die-border    : border colour
+--die-dot       : pip colour
+--die-radius    : corner rounding (0 = sharp, 50% = circle)
+─────────────────────────────────────────────── */
+--die-size:   72px;
+--die-bg:     #FDFAF3;
+--die-border: rgba(0,0,0,.15);
+--die-dot:    #2A2118;
+--die-radius: 14px;
+
+/* Roll animation duration (seconds) */
+--roll-duration: 1.5s;
+}
+
+/* ── demo page chrome ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+min-height: 100vh;
+background: var(--teal-dark);
+background-image:
+radial-gradient(ellipse at 20% 10%, rgba(90,145,150,.2) 0%, transparent 55%),
+radial-gradient(ellipse at 80% 90%, rgba(107,155,106,.12) 0%, transparent 55%);
+display: flex; align-items: center; justify-content: center;
+font-family: var(--font);
+color: var(--warm-white);
+gap: 12px;
+flex-direction: column;
+}
+
+.demo-btn {
+padding: 11px 28px;
+font-family: var(--font);
+font-size: .8rem;
+font-weight: 700;
+letter-spacing: .12em;
+text-transform: uppercase;
+border: none; border-radius: 8px;
+cursor: pointer;
+background: linear-gradient(145deg,#F5C842,#E8A820);
+color: var(--ink);
+border-bottom: 3px solid #b07a10;
+box-shadow: 0 3px 10px rgba(184,122,16,.4);
+transition: transform .12s ease;
+}
+.demo-btn:active { transform: scale(.96); }
+
+/* ═══════════════════════════════════════════════
+MODAL BACKDROP
+═══════════════════════════════════════════════ */
+.dice-backdrop {
+position: fixed; inset: 0;
+background: rgba(20,35,38,.82);
+backdrop-filter: blur(5px);
+-webkit-backdrop-filter: blur(5px);
+display: flex; align-items: center; justify-content: center;
+z-index: 500;
+
+opacity: 0;
+pointer-events: none;
+transition: opacity .25s ease;
+}
+.dice-backdrop.open {
+opacity: 1;
+pointer-events: all;
+}
+
+/* ═══════════════════════════════════════════════
+MODAL PANEL
+═══════════════════════════════════════════════ */
+.dice-modal {
+background: var(--card-face);
+border-radius: 16px;
+border: 1.5px solid rgba(255,255,255,.28);
+box-shadow: 0 24px 60px rgba(0,0,0,.65);
+width: min(300px, 88vw);
+overflow: hidden;
+display: flex;
+flex-direction: column;
+align-items: center;
+
+transform: translateY(40px) scale(.94);
+transition: transform .3s cubic-bezier(.34,1.2,.64,1);
+}
+.dice-backdrop.open .dice-modal {
+transform: translateY(0) scale(1);
+}
+
+/* Header strip */
+.dice-modal-header {
+width: 100%;
+background: linear-gradient(135deg, var(--teal-mid), var(--teal-dark));
+padding: 14px 20px 12px;
+display: flex; align-items: center; justify-content: space-between;
+}
+.dice-modal-title {
+font-size: .78rem;
+font-weight: 700;
+letter-spacing: .16em;
+text-transform: uppercase;
+color: var(--warm-white);
+}
+
+/* ── Stage where dice slide up from ── */
+.dice-stage {
+width: 100%;
+/* clip only vertically so slide-in from bottom is hidden below */
+overflow: hidden;
+padding: 28px 0 22px;
+display: flex;
+align-items: flex-end;   /* dice enter from bottom edge */
+justify-content: center;
+gap: 22px;
+background: var(--card-face);
+/* min-height keeps stage stable when switching 1↔2 dice */
+min-height: calc(var(--die-size) + 60px);
+}
+
+/* ── Result total ── */
+.dice-total {
+font-size: 1.5rem;
+font-weight: 700;
+letter-spacing: .06em;
+color: var(--ink);
+padding: 4px 0 16px;
+min-height: 2.4rem;
+text-align: center;
+opacity: 0;
+transition: opacity .3s ease .05s;
+}
+.dice-total.show { opacity: 1; }
+
+/* Footer */
+.dice-modal-footer {
+width: 100%;
+padding: 12px 20px 16px;
+display: flex; gap: 10px;
+border-top: 1px solid rgba(0,0,0,.08);
+}
+.dice-modal-footer .btn {
+flex: 1;
+display: inline-flex; align-items: center; justify-content: center;
+padding: 9px 16px;
+font-family: var(--font);
+font-size: .72rem;
+font-weight: 700;
+letter-spacing: .1em;
+text-transform: uppercase;
+border: none; border-radius: 8px;
+cursor: pointer;
+transition: transform .12s ease;
+position: relative; overflow: hidden;
+}
+.dice-modal-footer .btn::after {
+content: ‘’;
+position: absolute; inset: 0;
+background: linear-gradient(180deg,rgba(255,255,255,.12) 0%,transparent 55%);
+pointer-events: none;
+}
+.dice-modal-footer .btn:active { transform: scale(.96); }
+
+.btn-roll {
+background: linear-gradient(145deg,#5A9196,#3D6B6E);
+color: var(--warm-white);
+border-bottom: 3px solid #2E4A4F;
+box-shadow: 0 3px 10px rgba(46,74,79,.5);
+}
+.btn-confirm {
+background: linear-gradient(145deg,var(--gold-light),var(--gold));
+color: var(--ink);
+border-bottom: 3px solid #b07a10;
+box-shadow: 0 3px 10px rgba(184,122,16,.4);
+opacity: 0;
+pointer-events: none;
+transition: opacity .25s ease;
+}
+.btn-confirm.show { opacity: 1; pointer-events: all; }
+
+/* ═══════════════════════════════════════════════
+DIE ELEMENT
+Each .die is a square with pip layout defined
+by the value class (.val-1 through .val-6).
+═══════════════════════════════════════════════ */
+.die {
+width:  var(--die-size);
+height: var(--die-size);
+background: var(--die-bg);
+border-radius: var(--die-radius);
+border: 1.5px solid var(--die-border);
+box-shadow:
+0 6px 20px rgba(0,0,0,.28),
+inset 0 1px 0 rgba(255,255,255,.8);
+
+/* CSS grid: 3×3 pip positions */
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-template-rows:    repeat(3, 1fr);
+padding: 9px;
+gap: 3px;
+
+/* Start off-screen below the stage */
+transform: translateY(120%) rotate(-18deg);
+opacity: 0;
+}
+
+/* Pip */
+.pip {
+width: 100%; height: 100%;
+border-radius: 50%;
+background: var(--die-dot);
+/* Hidden by default; shown by value class */
+display: none;
+align-items: center;
+justify-content: center;
+}
+
+/*
+Grid positions for each of the 9 cells (row/col):
+1=top-left  2=top-centre  3=top-right
+4=mid-left  5=centre      6=mid-right
+7=bot-left  8=bot-centre  9=bot-right
+*/
+.pip-1 { grid-area: 1/1; }   /* top-left     */
+.pip-2 { grid-area: 1/2; }   /* top-centre   */
+.pip-3 { grid-area: 1/3; }   /* top-right    */
+.pip-4 { grid-area: 2/1; }   /* mid-left     */
+.pip-5 { grid-area: 2/2; }   /* centre       */
+.pip-6 { grid-area: 2/3; }   /* mid-right    */
+.pip-7 { grid-area: 3/1; }   /* bot-left     */
+.pip-8 { grid-area: 3/2; }   /* bot-centre   */
+.pip-9 { grid-area: 3/3; }   /* bot-right    */
+
+/* ── Standard die face layouts ──
+Which pips are visible for each value.
+Modify these if you want non-standard pip arrangements. */
+.val-1 .pip-5                                          { display:flex; }
+.val-2 .pip-1, .val-2 .pip-9                           { display:flex; }
+.val-3 .pip-1, .val-3 .pip-5, .val-3 .pip-9           { display:flex; }
+.val-4 .pip-1, .val-4 .pip-3, .val-4 .pip-7, .val-4 .pip-9 { display:flex; }
+.val-5 .pip-1, .val-5 .pip-3, .val-5 .pip-5, .val-5 .pip-7, .val-5 .pip-9 { display:flex; }
+.val-6 .pip-1, .val-6 .pip-3, .val-6 .pip-4, .val-6 .pip-6, .val-6 .pip-7, .val-6 .pip-9 { display:flex; }
+
+/* ═══════════════════════════════════════════════
+ROLL ANIMATION
+Die slides up from below the stage, spins,
+then settles. Two dice are staggered slightly.
+═══════════════════════════════════════════════ */
+
+/* Slide-up + spin keyframe */
+@keyframes die-roll {
+0%   { transform: translateY(130%) rotate(-24deg); opacity: 0; }
+25%  { opacity: 1; }
+/* “tumble” frames — the die wobbles as it lands */
+60%  { transform: translateY(-10%) rotate(370deg); opacity: 1; }
+75%  { transform: translateY(4%)   rotate(354deg); }
+88%  { transform: translateY(-3%)  rotate(361deg); }
+100% { transform: translateY(0)    rotate(360deg); opacity: 1; }
+}
+
+/* Applied by JS when rolling */
+.die.rolling {
+
+animation: die-roll var(--roll-duration) cubic-bezier(.22,.68,0,1.4) forwards;
+animation-delay: 0.5s;
+}
+
+/* Second die rolls in slightly later for a natural feel */
+.die.rolling.delay {
+animation-delay: 0.08s;
+}
