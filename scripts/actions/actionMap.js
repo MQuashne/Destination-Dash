@@ -2,6 +2,8 @@ import { render } from '../render.js';
 import { DiceRoller } from '../diceRoller/diceRoller.js'
 import { gameState } from '../main.js'
 import { shuffle } from '../setup.js'
+import { orderBox, choosePax } from '../generalModal.js'
+import { viewPile } from './viewPile.js'
 
 
 // ==========================================
@@ -11,17 +13,38 @@ import { shuffle } from '../setup.js'
 export function phaseCheck() {
   
   //Move from resolution to action
-  if (gameState.hand.cards.filter(c => c.type === "crisis").length <= 1 && gameState.phase === "resolution") { 
-    gameState.phase = "action" 
+  if (gameState.hand.cards.filter(c => c.type === "crisis").length <= 1 && gameState.phase === "resolution") {
+    if (gameState.active_effects.some(f => f === "fortune_avarice")) {
+      gameState.discardRemaining = ((gameState.hand.cards.length) - 1) - 5;
+      if (gameState.discardRemaining > 0) {
+        gameState.phase = "discard-avarice";
+      } else { gameState.phase === "action"; }
+    } else {
+      gameState.phase = "action";
+      console.log(`Res to Action. Phase:  ${gameState.phase}. Crises: ${gameState.hand.cards.filter(c => c.type === "crisis").length}`);
+      console.log(gameState.hand.cards.filter(c => c.type === "crisis"))
+      
+      
+    }
+    
+  } else {
+    if (gameState.phase === "resolution") {
+      console.log(`STILL Resolution. Phase:  ${gameState.phase}. Crises: ${gameState.hand.cards.filter(c => c.type === "crisis").length}`);
+      console.log(gameState.hand.cards.filter(c => c.type === "crisis"))
+    }
     
   }
   
-  if (gameState.phase==="end-discard" && gameState.discardRemaining<=0){
-    //not sure this is where i want to be
-    gameState.phase="boarding";
+  if (gameState.phase === "end-discard" && gameState.discardRemaining <= 0) {
+    gameState.phase = "end-turn";
   }
   
-  
+  if (gameState.phase === "draw-forced" && gameState.discardRemaining <= 0) {
+    gameState.phase = "action";
+  }
+  if (gameState.phase === "discard-avarice" && gameState.discardRemaining <= 0) {
+    gameState.phase = "action";
+  }
   console.log(gameState.phase);
 }
 
@@ -41,7 +64,10 @@ export function checkGameEnd() {
 }
 */
 export function notify(message, style = "none") {
-  const banner = document.getElementById("toast");
+  const bannerArea = document.getElementById('notifications');
+  let activeNotifications = bannerArea.children.length;
+  const banner = document.createElement('div')
+  banner.classList.add("toast", style);
   let icon = "";
   switch (style) {
     case 'crisis':
@@ -53,16 +79,21 @@ export function notify(message, style = "none") {
     case 'fortune':
       icon = "★ "
       break;
+    case 'dest':
+      icon = "✈ ";
+      break;
     default:
       icon = "";
   }
   banner.textContent = `${icon}${message}`;
-  banner.classList.add(style);
-  banner.classList.remove("hidden");
+  banner.style.setProperty('--notification-height', `${-120*activeNotifications}%`)
+  bannerArea.appendChild(banner);
+  
   banner.addEventListener("animationend", () => {
-    banner.classList.add("hidden");
-    banner.classList.remove(style)
+    banner.remove();
   });
+  
+  
 }
 
 export function addPax(pax) {
@@ -112,7 +143,7 @@ export function draw() {
   }
   if (gameState.active_effects.some(f => f === "crisis_forced_contract")) {
     //
-    // Handle Forced Discard
+    // Do Nothing
     //
   } else {
     
@@ -126,69 +157,100 @@ export function draw() {
     }
   }
   
+  
   //set phase
-  if (gameState.hand.cards.some(c => c.type === "crisis")) { gameState.phase = "resolution"; } else { gameState.phase = "action"; }
+  if (gameState.hand.cards.some(c => c.type === "crisis")) {
+    gameState.phase = "resolution";
+  } else {
+    if (gameState.active_effects.some(f => f === "fortune_avarice")) {
+      gameState.discardRemaining = ((gameState.hand.cards.length)) - 5;
+      gameState.phase = "discard-avarice"
+    } else {
+      gameState.phase = "action";
+    }
+    
+  }
   render(render);
 }
-
 
 export function endTurn() {
   //Die roll change logic
   document.getElementById("end-turn-btn").classList.add("hidden");
-  console.log(gameState.hand.cards)
-  if (gameState.actionsRemaining === 2 && gameState.hand.cards.length>0) {
-    gameState.phase="end-discard";
-    gameState.discardRemaining=1;
+  if (gameState.actionsRemaining === 2 && gameState.hand.cards.length > 0) {
+    gameState.phase = "end-discard";
+    gameState.discardRemaining = 1;
+    render(render);
     
-    const discardBanner = document.getElementById("banner");
-    discardBanner.textContent="Discard 1 Card";
+    /*const discardBanner = document.getElementById("banner");
+    discardBanner.textContent = "Discard 1 Card";
     discardBanner.classList.remove("hidden");
-    
+    */
     //force discard 1
     //
-  } else if (gameState.active_effects.some(c => c.id === "fortune_hack_the_system")) {
+  } /*else if (gameState.active_effects.some(c => c.id === "fortune_hack_the_system")) {
     //
     //user choose up to 6
     //
-  } else {
-    gameState.phase="end-turn";
+  } */else {
+    gameState.phase = "end-turn";
     render(render);
   }
 }
 
-export function boarding() {
+export async function boarding() {
   gameState.phase = "boarding";
-
-  document.getElementById("dice-title").textContent="Roll to add passengers";
+  
+  if (gameState.active_effects.some(f => f === "fortune_hack_the_system")) {
+    const paxAdd = await choosePax(true);
+    let wreck = addPax(paxAdd);
+    if (!wreck) {
+      //phaseCheck();
+      notify(`${paxAdd} Passengers Removed`, "crisis");
+      render(render);
+    }
+    
+} else {
+  document.getElementById("dice-title").textContent = "Roll to add passengers";
   DiceRoller.open(1, (total, values) => {
     let wreck = addPax(total);
     if (!wreck) {
       notify(`${total} Passengers Added`);
     }
-        //Clear the bad weather
-    const destZone = document.getElementById("destination-zone");
-    destZone.classList.remove("hidden");
     render(render);
   });
-    //Reset actions remaining
-  if (gameState.staged_effects.some(f => f === "fortune_overdrive")) {
-    gameState.actionsRemaining = 99;
-  } else {
-    gameState.actionsRemaining = 2;
-  }
+}
+//Clear the bad weather
+const destZone = document.getElementById("destination-zone");
+destZone.classList.remove("hidden");
+render(render);
+
+//Reset actions remaining
+gameState.actionsRemaining = 2;
+
+//Handle action counter 
+if (!gameState.staged_effects.some(f => f === "crisis_forced_contract")) {
+  gameState.forcedContractCount = 0;
+}
+//Activate staged effects
+gameState.active_effects = [];
+gameState.staged_effects.forEach((effect) => {
+  gameState.active_effects.push(effect);
+});
+gameState.staged_effects = [];
+
+if (gameState.active_effects.some(f => f === "crisis_forced_contract")) {
   
-  //Handle action counter 
-  if (!gameState.staged_effects.some(f => f === "crisis_forced_contract")) {
-    gameState.forcedContractCount = 0;
-    //otherwise reset counter after discard action
+  gameState.phase = "draw-forced";
+  gameState.discardRemaining = gameState.forcedContractCount;
+  if (gameState.hand.cards.length===0) gameState.discardRemaining=0;
+  if (gameState.discardRemaining <= 0) {
+    gameState.phase = "action";
   }
-  //Activate staged effects
-  gameState.active_effects = [];
-  gameState.staged_effects.forEach((effect) => {
-    gameState.active_effects.push(effect);
-  });
-  gameState.phase="draw";
-  render(render);
+  gameState.forcedContractCount = 0;
+} else {
+  gameState.phase = "draw";
+}
+render(render);
 }
 
 
@@ -226,14 +288,12 @@ export const effects = {
   },
   crisis_sabotaged: () => {
     
-   gameState.hand.cards.forEach((card, index) => {
-     setTimeout( () =>{
-     const myIndex=gameState.hand.cards.indexOf(card);
-     gameState.hand.removeCard(myIndex);},200*(index))
-   })
-   
-    phaseCheck();
+    gameState.scrapyard.push(...gameState.hand.cards.filter((ci) => ci.id!=="crisis_sabotaged"));
+    
+    gameState.hand.clearHand();
+    
     notify("All Cards Discarded", "crisis");
+    phaseCheck();
     render(render);
   },
   crisis_temporal_anomaly: () => {
@@ -286,7 +346,7 @@ export const effects = {
     render(render);
   },
   crisis_forced_contract: () => {
-    gameState.staged_effects.push("forced_contract");
+    gameState.staged_effects.push("crisis_forced_contract");
     notify("No Draw Next Turn", "crisis");
     phaseCheck();
     render(render);
@@ -297,5 +357,83 @@ export const effects = {
     phaseCheck();
     render(render);
     
+  },
+  crisis_full_metal_alchemist: () => {
+    let wreck = addPax(gameState.fuel - gameState.pax);
+    if (!wreck) {
+      phaseCheck();
+      if (gameState.fuel - gameState.pax >= 0) {
+        notify(`${gameState.fuel-gameState.pax} Passengers Added`, "crisis")
+      }
+      else {
+        notify(`${gameState.pax-gameState.fuel} Passengers Removed`, "crisis")
+      }
+    }
+    render(render);
+    
+  },
+  fortune_reroute: () => {
+    if (gameState.map.length === 0) {
+      gameState.fuel = 0;
+      gameState.pax = 0;
+      notify("Aircraft Emptied", "fortune");
+    } else {
+      const banner = document.getElementById("banner");
+      const destZone = document.getElementById("destination-zone");
+      const cover = document.getElementById("cover");
+      gameState.phase = "reroute";
+      banner.classList.add("fortune");
+      
+      banner.textContent = "Reroute 1 Location";
+      
+      cover.classList.remove("hidden");
+      
+      //stack elements
+      cover.style.zIndex = 800;
+      destZone.style.zIndex = 900;
+      banner.style.zIndex = 900;
+      
+      
+      gameState.phase = "reroute";
+    }
+    render(render);
+  },
+  fortune_20_20_vision: () => {
+    orderBox();
+    render(render);
+  },
+  fortune_avarice: () => {
+    gameState.staged_effects.push("fortune_avarice");
+  },
+  fortune_overdrive: () => {
+    gameState.actionsRemaining = 99;
+  },
+  fortune_garbage_collector: () => {
+    viewPile("scrap", true);
+  },
+  fortune_hack_the_system: () => {
+    gameState.active_effects.push("fortune_hack_the_system");
+    /* const paxAdd = await choosePax(true);
+     let wreck = addPax(paxAdd);
+     if (!wreck) {
+       phaseCheck();
+       notify(`${paxAdd} Passengers Added`, "crisis");
+       render(render);*/
+  },
+  fortune_good_riddance: async () => {
+    const paxAdd = await choosePax(false);
+    let wreck = addPax(0 - paxAdd);
+    if (!wreck) {
+      phaseCheck();
+      notify(`${paxAdd} Passengers Removed`, "crisis");
+      render(render);
+    }
+    
+  },
+  fortune_crystal_ball: () => {
+    viewPile("bone");
+    phaseCheck();
+    render(render);
   }
+  
 }

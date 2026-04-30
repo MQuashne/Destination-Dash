@@ -15,6 +15,11 @@ import { effects, phaseCheck, endTurn, boarding, draw } from './actions/actionMa
 
 import { gameState } from './main.js'
 
+import { viewPile } from './actions/viewPile.js';
+
+import { choosePax } from './generalModal.js';
+
+
 
 export function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -27,8 +32,6 @@ export function shuffle(array) {
 }
 
 
-
-
 export function setupGame() {
   gameState.map = shuffle(Destinations);
   gameState.boneyard = shuffle(Cards);
@@ -37,7 +40,7 @@ export function setupGame() {
   shuffle(gameState.boneyard);
   gameState.startHand.push(...gameState.boneyard.splice(0, 1));
   //debugging only!
-  gameState.startHand.push(gameState.boneyard.find(item => item.id === 'crisis_sabotaged'));
+  //gameState.startHand.push(gameState.boneyard.find(item => item.id === 'fortune_20_20_vision'));
   
   //wire buttons
   document.getElementById('modal-play-btn').onclick = () => { const c = gameState.hand.getActiveCard(); if (c && gameState.hand._cbPlay) gameState.hand._cbPlay(c); };
@@ -50,38 +53,48 @@ export function setupGame() {
     const avertc = gameState.hand.cards.find(h => h.id === "fortune_crisis_averted");
     const avertcIndex = gameState.hand.cards.indexOf(avertc);
     gameState.hand.navigateTo(avertcIndex);
-    gameState.hand._cbPlay(avertc);
+    
+    setTimeout(gameState.hand._cbPlay(avertc),500);
   };
   
   document.getElementById("resolve-crises-btn").addEventListener("click", () => {
     const firstCrisis = gameState.hand.cards.filter(c => c.type === "crisis")[0];
     const firstCrisisIndex = gameState.hand.cards.indexOf(firstCrisis);
     gameState.hand.navigateTo(firstCrisisIndex);
+    phaseCheck();
   });
   document.getElementById("end-turn-btn").addEventListener("click", () => {
     endTurn();
   });
   document.getElementById("modal-discard-btn").addEventListener("click", () => {
-    const c = gameState.hand.getActiveCard()
+    const c = gameState.hand.getActiveCard();
     gameState.discardRemaining = Math.max(gameState.discardRemaining - 1, 0);
     gameState.hand._cbDiscard(c)
   });
   document.getElementById("draw-btn").addEventListener("click", () => {
-  draw();
-});
+    draw();
+  });
   document.getElementById("boarding-btn").addEventListener("click", () => {
-  boarding();
-});
+    boarding();
+  });
   
+  document.getElementById("scrap-card").addEventListener("click", () => {
+    if (gameState.scrapyard.length > 0) {
+  viewPile("scrap",false);
+    }
+  });
   
   //
   //add banner row buttons
   //
+//choosePax();
 }
 
 export function deal(renderCallback) {
   
   //Initiate player hand stage
+  
+  
   const hand = new CardHand('#hand-stage', {
     swipeThreshold: 40,
     holdDelay: 480,
@@ -115,11 +128,11 @@ export function deal(renderCallback) {
         }
         
         
-      } else if (gameState.phase === "end-discard") {
+      } else if (gameState.phase === "end-discard" || gameState.phase === "draw-forced" || gameState.phase === "discard-avarice") {
         modalDiscardBtn.classList.remove("hidden");
       } else {
         modalPlayBtn.classList.remove("hidden");
-        if (gameState.phase === "resolution" || gameState.actionsRemaining === 0) { modalPlayBtn.disabled = true; } else { modalPlayBtn.disabled = false; }
+        if (gameState.phase === "action" && gameState.actionsRemaining > 0) { modalPlayBtn.disabled = false; } else { modalPlayBtn.disabled = true; }
       }
       
     },
@@ -136,20 +149,22 @@ export function deal(renderCallback) {
         gameState.actionsRemaining--;
       };
       gameState.scrapyard.push(c);
+      phaseCheck();
       renderCallback(renderCallback);
+      
     },
     onCardDiscard(c) {
       hand.closeModal();
       hand.removeActiveCard({ animate: true });
-      phaseCheck();
       gameState.scrapyard.push(c);
       
-if (gameState.discardRemaining <= 0) {
-  if (gameState.phase === "end-discard") {
-    gameState.phase = "end-turn";
-   
-  }
-}
+      if (gameState.discardRemaining <= 0) {
+        if (gameState.phase === "end-discard") {
+          gameState.phase = "end-turn";
+          
+        }
+      }
+      phaseCheck()
       renderCallback(renderCallback);
     },
   });
@@ -163,6 +178,10 @@ if (gameState.discardRemaining <= 0) {
   hand.dealHand(gameState.startHand);
   hand.navigateTo(0);
   //Set first phase
-  if (hand.cards.some(c => c.type === "crisis")) { gameState.phase = "resolution"; } else { gameState.phase = "action"; }
+  if (hand.cards.some(c => c.type === "crisis")) {
+    gameState.phase = "resolution"; 
+  } else { 
+    gameState.phase = "action"; 
+  }
   gameState.hand = hand;
 }

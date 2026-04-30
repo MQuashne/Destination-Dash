@@ -2,6 +2,7 @@ import { setupGame, deal } from './setup.js';
 import { render } from './render.js';
 import { DiceRoller } from "./diceRoller/diceRoller.js";
 
+
 export const gameState = {
   map: [],
   destinationsOnBoard: [],
@@ -129,4 +130,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   });
   setupGame();
   render(render);
+  //const doBtn=document.getElementById("go");
+  //doBtn.addEventListener("click", () => {
+//  });
 })

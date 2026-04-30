@@ -2,6 +2,7 @@ import { gameState } from './main.js';
 import { viewDestination } from './actions/fly.js';
 
 
+
 //Itinerary
 function renderDestinations(renderCallback) {
   const destinationZone = document.getElementById("destination-zone");
@@ -24,12 +25,21 @@ function renderDestinations(renderCallback) {
     if (!dest.open) {
       el.classList.add("flipped");
     } else {
-      el.addEventListener("click", () => { 
-        console.log("clicked");
-        viewDestination(dest) });
+      el.addEventListener("click", () => {
+        viewDestination(dest)
+      });
     }
     destinationZone.appendChild(el);
   });
+  let completionMarkers = "";
+  for (let i = 1; i <= 8; i++) {
+    if (i <= gameState.log.length) {
+      completionMarkers += "check_circle\n";
+    } else {
+      completionMarkers += "radio_button_unchecked\n";
+    }
+  }
+  document.getElementById("destination-progress").textContent = completionMarkers;
 }
 
 
@@ -76,6 +86,16 @@ function renderPlanes(renderCallback) {
   })
 }
 
+function renderScrap(renderCallback) {
+  const scrap = document.getElementById("scrap-card");
+  if (gameState.scrapyard.length === 0) {
+    scrap.classList.add("invisible");
+  } else {
+    scrap.classList.remove("invisible");
+    scrap.src = `images/${gameState.scrapyard[gameState.scrapyard.length-1].id}.png`;
+  }
+}
+
 
 function renderButtons(renderCallback) {
   const actionRow = document.getElementById("action-row");
@@ -86,6 +106,8 @@ function renderButtons(renderCallback) {
   const resolveCrisesButton = document.getElementById("resolve-crises-btn");
   const boardingButton = document.getElementById("boarding-btn");
   const banner = document.getElementById("banner");
+  //const debug=document.getElementById("do");
+  //debug.textContent=gameState.phase;
   endTurnButton.textContent = `End Turn (${gameState.actionsRemaining})`
   
   for (const child of actionRow.children) {
@@ -108,14 +130,17 @@ function renderButtons(renderCallback) {
     case 'end-discard':
       banner.classList.remove("hidden");
       break;
-     case 'end-turn':
-       boardingButton.classList.remove("hidden");
+    case 'reroute':
+      banner.classList.remove("hidden");
+      break;
+    case 'end-turn':
+      boardingButton.classList.remove("hidden");
     default:
       // Tab to edit
   }
-  
-  if (gameState.phase === "start") {
-    
+  if (gameState.phase === "draw-forced" || gameState.phase === "end-discard" || gameState.phase === "discard-avarice") {
+    banner.textContent = `Discard ${gameState.discardRemaining} Cards`;
+    banner.classList.remove("hidden");
   }
   
 }
@@ -125,7 +150,6 @@ export function render(renderCallback) {
   renderFuel(renderCallback);
   renderPax(renderCallback);
   renderPlanes(renderCallback);
+  renderScrap(renderCallback);
   renderButtons(renderCallback);
 }
-
-

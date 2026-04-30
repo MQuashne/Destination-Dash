@@ -129,6 +129,7 @@ export const DiceRoller = (() => {
 
     /* Show backdrop */
     backdrop.classList.add('open');
+    backdrop.classList.remove("hidden");
 
     /* Auto-roll on open so the dice are already moving */
     requestAnimationFrame(() => roll());
@@ -139,6 +140,7 @@ export const DiceRoller = (() => {
     backdrop.classList.remove('open');
     _rolling  = false;
     _callback = null;
+    backdrop.classList.add("hidden");
   }
 
   /* ── Button listeners ── */

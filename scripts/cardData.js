@@ -143,99 +143,99 @@ export const Cards = [
 },
 {
   id: "fuel_2",
-  title: "Fuel 2",
+  title: "2 Fuel",
   type: "fuel",
   fuel_value: 2
 },
 {
   id: "fuel_3",
-  title: "Fuel 3",
+  title: "3 Fuel",
   type: "fuel",
   fuel_value: 3
 },
 {
   id: "fuel_4",
-  title: "Fuel 4",
+  title: "4 Fuel",
   type: "fuel",
   fuel_value: 4
 },
 {
   id: "fuel_5",
-  title: "Fuel 5",
+  title: "5 Fuel",
   type: "fuel",
   fuel_value: 5
 },
 {
   id: "fuel_6",
-  title: "Fuel 6",
+  title: "6 Fuel",
   type: "fuel",
   fuel_value: 6
 },
 {
   id: "fuel_7",
-  title: "Fuel 7",
+  title: "7 Fuel",
   type: "fuel",
   fuel_value: 7
 },
 {
   id: "fuel_8",
-  title: "Fuel 8",
+  title: "8 Fuel",
   type: "fuel",
   fuel_value: 8
 },
 {
   id: "fuel_2",
-  title: "Fuel 2",
+  title: "2 Fuel",
   type: "fuel",
   fuel_value: 2
 },
 {
   id: "fuel_3",
-  title: "Fuel 3",
+  title: "3 Fuel",
   type: "fuel",
   fuel_value: 3
 },
 {
   id: "fuel_4",
-  title: "Fuel 4",
+  title: "4 Fuel",
   type: "fuel",
   fuel_value: 4
 },
 {
   id: "fuel_5",
-  title: "Fuel 5",
+  title: "5 Fuel",
   type: "fuel",
   fuel_value: 5
 },
 {
   id: "fuel_6",
-  title: "Fuel 6",
+  title: "6 Fuel",
   type: "fuel",
   fuel_value: 6
 },
 {
   id: "fuel_7",
-  title: "Fuel 7",
+  title: "7 Fuel",
   type: "fuel",
   fuel_value: 7
 },
 {
   id: "fuel_8",
-  title: "Fuel 8",
+  title: "8 Fuel",
   type: "fuel",
   fuel_value: 8
 },
 {
   id: "fuel_1",
-  title: "Fuel 1",
+  title: "1 Fuel",
   type: "fuel",
   fuel_value: 1
 },
 {
   id: "fuel_1",
-  title: "Fuel 1",
+  title: "1 Fuel",
   type: "fuel",
-  fuel_value: 2
+  fuel_value: 1
 }]
 
 export const Destinations = [

@@ -70,7 +70,7 @@ background: rgba(20,35,38,.82);
 backdrop-filter: blur(5px);
 -webkit-backdrop-filter: blur(5px);
 display: flex; align-items: center; justify-content: center;
-z-index: 500;
+z-index: 1500;
 
 opacity: 0;
 pointer-events: none;
@@ -79,6 +79,9 @@ transition: opacity .25s ease;
 .dice-backdrop.open {
 opacity: 1;
 pointer-events: all;
+}
+.hidden {
+  display: none;
 }
 
 /* ═══════════════════════════════════════════════

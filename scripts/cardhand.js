@@ -75,11 +75,27 @@ export class CardHand {
       this._layout(animate);
       this._dots();
       this._hints();
-      if (animate) {
-        el.classList.add('card-entering');
-        el.addEventListener('animationend',
-          () => el.classList.remove('card-entering'), { once: true });
-      }
+     if (animate) {
+  el.classList.add('card-entering');
+
+  // Only respond to the specific animation on this element, not bubbled events
+  const onEnd = (e) => {
+    if (e.target !== el) return;  // ignore bubbled child events
+    el.classList.remove('card-entering');
+    el.removeEventListener('animationend', onEnd);
+    clearTimeout(fallback);
+  };
+
+  // Fallback: remove the class after animation duration + buffer
+  // even if animationend never fires
+  const fallback = setTimeout(() => {
+    el.classList.remove('card-entering');
+    el.removeEventListener('animationend', onEnd);
+  }, 800); // match your animation duration + some buffer
+
+  el.addEventListener('animationend', onEnd);
+}
+
     });
   }
   
@@ -105,6 +121,37 @@ export class CardHand {
   
   removeActiveCard(opts={}) { this.removeCard(this.activeIndex,opts); }
   
+clearHand(opts = {}) {
+  if (!this._els.length) return;
+
+  const els   = [...this._els];    // snapshot before we clear
+  const delay = opts.animate !== false ? 220 : 0;
+
+  // Clear the data arrays immediately — no more races
+  this.cards       = [];
+  this._els        = [];
+  this.activeIndex = 0;
+  this._dots();
+  this._hints();
+
+  if (opts.animate !== false) {
+    // Stagger the exit animations slightly for a natural feel
+    els.forEach((el, i) => {
+      setTimeout(() => {
+        el.style.transition = 'opacity .2s ease, transform .2s ease';
+        el.style.opacity    = '0';
+        el.style.transform += ' translateY(30px) scale(.88)';
+        // Remove from DOM after animation
+        setTimeout(() => el.remove(), 220);
+      }, i * 40);
+    });
+  } else {
+    // Instant removal
+    els.forEach(el => el.remove());
+  }
+}
+
+
 dealHand(cards) {
   cards.forEach(c => {
     this.cards.push(c);
@@ -211,7 +258,6 @@ dealHand(cards) {
     document.getElementById('modal-title').textContent = card.title ?? '';
     document.getElementById('modal-body').textContent = card.body ?? '';
     
-    console.log(gameState.active_effects.some(a=> a==="fortune_a_pound_in_flesh"));
     
     if (gameState.active_effects.some(a=> a==="fortune_a_pound_in_flesh")){
       document.getElementById('modal-body').textContent = "FUEL DOUBLED AND PASSENGERS REMOVED THIS PLAY!"
@@ -231,7 +277,8 @@ dealHand(cards) {
     });*/
     
     const backdrop = document.getElementById("modal-backdrop");
-    backdrop.classList.add('open');
+    backdrop.classList.remove('hidden');
+   
     const close = e => {
       if (e.target === backdrop) {
         this.closeModal();
@@ -242,7 +289,7 @@ dealHand(cards) {
   }
   
   closeModal() {
-    document.getElementById('modal-backdrop')?.classList.remove('open');
+    document.getElementById('modal-backdrop')?.classList.add('hidden');
   }
   
   /* ── LAYOUT ENGINE ──────────────────────────────── */

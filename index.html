@@ -15,9 +15,11 @@
 </head>
 
 <body>
-  <header></header>
+  <header>
+    <!-- <div id="do">Thing</div>
+    <button id="go">go</button>-->
+  </header>
   <main>
-    
     <div id="game-content">
       <div id="destination-row" class="game-row">
         <div id="departure-heading"><span class="material-icons">
@@ -27,8 +29,8 @@
             task_alt
           </span> -->
           <span class="material-icons" id="destination-progress">
-           
-             radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked
+          
+            radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked radio_button_unchecked
           </span>
           
           
@@ -98,6 +100,11 @@
             <img class="plane" src="images/plane.png" />
           </div>
         </div>
+        <div id="scrap-row"><span class="zone-label">Scrap</span>
+          <div id="scrap-zone">
+            <img id="scrap-card" class="invisible" src="images/card_back.png" />
+          </div>
+        </div>
       </div>
       <div id="action-row">
         <button id="deal-btn" class="btn btn-primary hidden">Deal</button>
@@ -107,17 +114,20 @@
         <button id="boarding-btn" class="btn btn-primary hidden">💺 Board Passengers</button>
         <button id="resolve-crises-btn" class="btn btn-danger hidden">⚠ RESOLVE CRISES! ⚠</button>
         <div id="banner" class="banner discard hidden">Discard X Cards</div>
+        <button class="btn btn-ghost">Scrap</button>
       </div>
       
       <div class="hand-stage" id="hand-stage">
         <div class="nav-hint left" id="nav-left">‹</div>
         <div class="nav-hint right" id="nav-right">›</div>
+        
       </div>
+      
       
     </div>
     
     <!-- CARD PLAY MODAL-->
-    <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal-backdrop hidden" id="modal-backdrop">
       <div class="modal" id="modal">
         <div class="modal-art" id="modal-art"><img src="images/fortune_crystal_ball.png"></div>
         <div class="modal-header">
@@ -132,35 +142,42 @@
           <button class="btn btn-fortune hidden" id="modal-avert-btn">★ Crisis Averted</button>
           <button class="btn btn-play" id="modal-fly-btn">✈ Fly</button>
           <button class="btn btn-discard" id="modal-discard-btn">🗑️ Discard</button>
+          <button class="btn btn-fortune" id="modal-reroute-btn">♻️ Reroute</button>
+          <button class="btn btn-fortune" id="modal-restore-btn">♻️ Restore</button>
           <button class="btn btn-discard" id="modal-close-btn">✕ Close</button>
           <button class="btn btn-discard" id="modal-dest-close-btn">✕ Close</button>
-          
+          <button class="btn btn-discard" id="modal-view-close-btn">✕ ViewClose</button>
         </div>
       </div>
     </div>
     
+    
+    
     <!-- OTHER/ALL-PURPOSE MODAL-->
-    <div class="modal-backdrop" id="gen-modal-backdrop">
+    <div class="modal-backdrop hidden" id="gen-modal-backdrop">
       <div class="modal" id="gen-modal" style="position:relative; max-width:100%; box-shadow: none;">
         <div class="modal-header" id="gen-modal-header">
-          <span class="modal-title" id="gen-modal-title">Title</span>
+          <span class="modal-title" id="gen-modal-title">20/20 Vision</span>
         </div>
         <div class="modal-body" id="gen-modal-body">
-          <p id="gen-modal-headline">Headline</p>
+          <p id="gen-modal-headline">Look at the top 5 cards in the boneyard and reorder them.</p>
           <p style="margin-top: 10px;" class="flavor-text" id="gen-modal-text">Body text</p>
-          <div id="gen-modal-other-content"class="hidden"></div>
+          <div id="gen-modal-other-content">
+            
+          </div>
         </div>
         <div class="modal-footer" id="gen-modal-footer">
         </div>
       </div>
     </div>
     
+    <!--SCRAPYARD MODAL -->
+    
+    
     
   </main>
   <div class="dice-backdrop" id="dice-backdrop">
     <div class="dice-modal">
-      
-      ```
       <div class="dice-modal-header">
         <span class="dice-modal-title" id="dice-title">Roll</span>
       </div>
@@ -178,7 +195,8 @@
       </div>
     </div>
   </div>
-  <div class="toast hidden" id="toast">✈ Flying to Sunset Island…</div>
+  <div id="cover" class="modal-backdrop hidden"></div>
+  <div id="notifications"></div>
   
   <script type="module" src="scripts/main.js"></script>
   <script type="module" src="scripts/cardhand.js"></script>
