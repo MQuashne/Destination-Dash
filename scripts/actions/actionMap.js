@@ -119,6 +119,7 @@ export function addFuel(fuel) {
   if (gameState.active_effects.some(a => a === "fortune_a_pound_in_flesh")) {
     gameState.pax = Math.max(gameState.pax - fuel, 0);
     fuel += fuel;
+    gameState.active_effects.splice(gameState.active_effects.indexOf("fortune_a_pound_in_flesh"),1)
   }
   gameState.fuel += fuel;
   phaseCheck();
@@ -205,7 +206,7 @@ export async function boarding() {
     let wreck = addPax(paxAdd);
     if (!wreck) {
       //phaseCheck();
-      notify(`${paxAdd} Passengers Removed`, "crisis");
+      notify(`${paxAdd} Passengers Added`, "crisis");
       render(render);
     }
     
@@ -269,6 +270,7 @@ export const effects = {
     render(render);
   },
   crisis_fuel_leak: () => {
+    document.getElementById("dice-title").textContent = "Roll to lose fuel";
     DiceRoller.open(2, (total, values) => {
       let remove = Math.min(total, gameState.fuel);
       gameState.fuel -= remove;
@@ -298,7 +300,11 @@ export const effects = {
   },
   crisis_temporal_anomaly: () => {
     if (gameState.log.length > 0) {
+      if (gameState.destinationsOnBoard.length<3){
+        gameState.destinationsOnBoard.unshift(...gameState.log.splice(0, 1));
+      }else{
       gameState.map.unshift(...gameState.log.splice(0, 1));
+      }
       notify("1 Destination Returned to Map", "crisis");
     } else {
       notify("0 Destinations Returned", "crisis");
@@ -312,8 +318,9 @@ export const effects = {
     render(render);
   },
   crisis_bad_weather: () => {
-    const destZone = document.getElementById("destination-zone");
-    destZone.classList.add("hidden");
+    gameState.active_effects.push("crisis_bad_weather");
+    //const destZone = document.getElementById("destination-zone");
+    //destZone.classList.add("hidden");
     notify("All Destinations Closed", "crisis");
     phaseCheck();
     render(render);
@@ -407,6 +414,7 @@ export const effects = {
   },
   fortune_overdrive: () => {
     gameState.actionsRemaining = 99;
+    gameState.active_effects.push("fortune_overdrive");
   },
   fortune_garbage_collector: () => {
     viewPile("scrap", true);

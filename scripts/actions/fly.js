@@ -56,7 +56,7 @@ export function viewDestination(card) {
   }
   closeButton.classList.remove("hidden");
   
-  if (gameState.phase !== "action" || gameState.actionsRemaining === 0 || gameState.fuel < card.fuel || gameState.pax < card.min_pax || gameState.pax > card.max_pax) {
+  if (gameState.phase !== "action" || gameState.actionsRemaining === 0 || gameState.fuel < card.fuel || gameState.pax < card.min_pax || gameState.pax > card.max_pax || gameState.active_effects.some(f => f==="crisis_bad_weather")) {
     flyButton.disabled = true;
   } else {
     flyButton.disabled = false;

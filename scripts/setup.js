@@ -19,6 +19,8 @@ import { viewPile } from './actions/viewPile.js';
 
 import { choosePax } from './generalModal.js';
 
+import {debugScreen} from './debug.js';
+
 
 
 export function shuffle(array) {
@@ -40,7 +42,7 @@ export function setupGame() {
   shuffle(gameState.boneyard);
   gameState.startHand.push(...gameState.boneyard.splice(0, 1));
   //debugging only!
-  //gameState.startHand.push(gameState.boneyard.find(item => item.id === 'fortune_20_20_vision'));
+  //gameState.startHand.push(gameState.boneyard.find(item => item.id === 'fortune_overdrive'));
   
   //wire buttons
   document.getElementById('modal-play-btn').onclick = () => { const c = gameState.hand.getActiveCard(); if (c && gameState.hand._cbPlay) gameState.hand._cbPlay(c); };
@@ -83,6 +85,10 @@ export function setupGame() {
   viewPile("scrap",false);
     }
   });
+  const debug=document.getElementById("debug");
+  document.getElementById("track").addEventListener("click", () => {
+  debugScreen();
+});
   
   //
   //add banner row buttons

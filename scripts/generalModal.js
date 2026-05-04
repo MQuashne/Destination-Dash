@@ -31,6 +31,8 @@ export function orderBox() {
     
     gameState.boneyard.unshift(...visionCards);
     genModalBackdrop.classList.add("hidden");
+    genModalContent.innerHTML = '';
+    
   });
   
   
@@ -158,61 +160,62 @@ export function orderBox() {
 export function choosePax(add = true) {
   return new Promise((resolve) => {
     genModalText.innerHTML = '';
-let p = 0;
-const chooser = document.createElement("div");
-const subtractBtn = document.createElement("div");
-const addBtn = document.createElement("div");
-const selectValue = document.createElement("div");
-const doneBtn = document.createElement("button");
-chooser.classList.add("chooser");
-doneBtn.classList.add("btn", "btn-fortune");
-doneBtn.textContent = `${add ? "Add" : "Remove"} ${p} Passengers`;
-
-doneBtn.addEventListener("click", () => {
-  genModalContent.innerHTML = '';
-  genModalFooter.innerHTML = '';
-  genModalBackdrop.classList.add("hidden");
-  resolve(p);
-})
-
-
-subtractBtn.classList.add("btn", "btn-primary", "material-icons");
-
-subtractBtn.textContent = "remove";
-subtractBtn.addEventListener("click", () => {
-  if (p > 0) {
-    p--;
-    selectValue.textContent = p;
+    genModalContent.innerHTML='';
+    let p = 0;
+    const chooser = document.createElement("div");
+    const subtractBtn = document.createElement("div");
+    const addBtn = document.createElement("div");
+    const selectValue = document.createElement("div");
+    const doneBtn = document.createElement("button");
+    chooser.classList.add("chooser");
+    doneBtn.classList.add("btn", "btn-fortune");
     doneBtn.textContent = `${add ? "Add" : "Remove"} ${p} Passengers`;
-  }
-})
-
-addBtn.classList.add("btn", "btn-primary", "material-icons");
-addBtn.textContent = "add";
-
-addBtn.addEventListener("click", () => {
-  if ((add && p < 6) || (!add && p < Math.min(gameState.pax, 6))) {
-    p++;
-    selectValue.textContent = p;
-    doneBtn.textContent = `${add ? "Add" : "Remove"} ${p} Passengers`;
-  }
-})
-
-
-selectValue.textContent = p
-
-chooser.appendChild(subtractBtn);
-chooser.appendChild(selectValue);
-chooser.appendChild(addBtn);
-genModalContent.appendChild(chooser);
-genModalFooter.appendChild(doneBtn);
-
-
-genModalTitle.textContent = add ? "Hack the System" : "Good Riddance";
-genModalHeadline.textContent = add ? "Gain up to six passengers at the end of this turn" : "Lose up to 6 passengers";
-
-
-genModalBackdrop.classList.remove("hidden");
+    
+    doneBtn.addEventListener("click", () => {
+      genModalContent.innerHTML = '';
+      genModalFooter.innerHTML = '';
+      genModalBackdrop.classList.add("hidden");
+      resolve(p);
+    })
+    
+    
+    subtractBtn.classList.add("btn", "btn-primary", "material-icons");
+    
+    subtractBtn.textContent = "remove";
+    subtractBtn.addEventListener("click", () => {
+      if (p > 0) {
+        p--;
+        selectValue.textContent = p;
+        doneBtn.textContent = `${add ? "Add" : "Remove"} ${p} Passengers`;
+      }
+    })
+    
+    addBtn.classList.add("btn", "btn-primary", "material-icons");
+    addBtn.textContent = "add";
+    
+    addBtn.addEventListener("click", () => {
+      if ((add && p < 6) || (!add && p < Math.min(gameState.pax, 6))) {
+        p++;
+        selectValue.textContent = p;
+        doneBtn.textContent = `${add ? "Add" : "Remove"} ${p} Passengers`;
+      }
+    })
+    
+    
+    selectValue.textContent = p
+    
+    chooser.appendChild(subtractBtn);
+    chooser.appendChild(selectValue);
+    chooser.appendChild(addBtn);
+    genModalContent.appendChild(chooser);
+    genModalFooter.appendChild(doneBtn);
+    
+    
+    genModalTitle.textContent = add ? "Hack the System" : "Good Riddance";
+    genModalHeadline.textContent = add ? "Gain up to six passengers at the end of this turn" : "Lose up to 6 passengers";
+    
+    
+    genModalBackdrop.classList.remove("hidden");
     
   })
   

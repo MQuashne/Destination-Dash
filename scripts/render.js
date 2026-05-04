@@ -3,6 +3,10 @@ import { viewDestination } from './actions/fly.js';
 
 
 
+
+
+
+
 //Itinerary
 function renderDestinations(renderCallback) {
   const destinationZone = document.getElementById("destination-zone");
@@ -40,6 +44,7 @@ function renderDestinations(renderCallback) {
     }
   }
   document.getElementById("destination-progress").textContent = completionMarkers;
+ 
 }
 
 
@@ -108,7 +113,7 @@ function renderButtons(renderCallback) {
   const banner = document.getElementById("banner");
   //const debug=document.getElementById("do");
   //debug.textContent=gameState.phase;
-  endTurnButton.textContent = `End Turn (${gameState.actionsRemaining})`
+  endTurnButton.textContent = `End Turn (${gameState.actionsRemaining>2 ? "∞" : gameState.actionsRemaining})`
   
   for (const child of actionRow.children) {
     child.classList.add("hidden");
@@ -142,6 +147,61 @@ function renderButtons(renderCallback) {
     banner.textContent = `Discard ${gameState.discardRemaining} Cards`;
     banner.classList.remove("hidden");
   }
+  
+  const effectBanner = document.getElementById("effect");
+  
+  if (gameState.active_effects.length + gameState.staged_effects.length > 0) {
+    effectBanner.classList.remove("hidden");
+  } else {
+    effectBanner.className = "banner banner-small hidden"
+  }
+  if (gameState.staged_effects.length > 0) {
+    switch (gameState.staged_effects[gameState.staged_effects.length - 1]) {
+      case 'crisis_forced_contract':
+        effectBanner.textContent = "No draw next turn, discard same number as actions";
+        effectBanner.classList.add("crisis");
+        break;
+      case 'fortune_avarice':
+        effectBanner.textContent = "Draw to 8, discard to 5 after crises";
+        effectBanner.classList.add("fortune");
+        break;
+      default:
+        effectBanner.classList.add("hidden");
+    }
+  }
+  console.log(gameState.active_effects.length)
+  
+  if (gameState.active_effects.length > 0) {
+    console.log("switch")
+    console.log(gameState.active_effects[gameState.active_effects.length - 1])
+    switch (gameState.active_effects[gameState.active_effects.length - 1]) {
+      case 'fortune_a_pound_in_flesh':
+        effectBanner.textContent = "Double next fuel this turn, subtract pax";
+        effectBanner.classList.add("fortune");
+        
+        break;
+      case 'fortune_hack_the_system':
+        effectBanner.textContent = "Choose passengers instead of rolling";
+        effectBanner.classList.add("fortune");
+        break;
+      case 'crisis_bad_weather':
+        effectBanner.textContent = "No flying this turn";
+        effectBanner.classList.add("crisis");
+        break;
+      case 'fortune_overdrive':
+        effectBanner.textContent = "Infinite actions this turn";
+        effectBanner.classList.add("fortune");
+        console.log("style");
+        break;
+      default:
+        effectBanner.classList.add("hidden");
+        console.log("default");
+    }
+    
+  }
+  
+  
+  
   
 }
 
